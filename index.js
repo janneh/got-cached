@@ -19,7 +19,7 @@ export default function gotCached(options) {
   }
 
   function getCache(key) {
-    const promise = cache.get(key).then((value) => {
+    const promise = cache.get(key).then(value => {
       if (!value) return null
 
       return Promise.resolve({
@@ -42,10 +42,8 @@ export default function gotCached(options) {
         // return the cached result if it exist
         if(cached) return cached
 
-        const response = setCache(url, got(url, options))
-
-        // return got response for non-cached requests
-        return response
+        // return got response but first set cache with it
+        return setCache(url, got(url, options))
       })
 
     return cachedResponse
