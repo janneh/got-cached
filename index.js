@@ -1,7 +1,7 @@
 import got from 'got'
 
 /*
-* Returns got (wrapped with cache) to be used as normal got (for http requests)
+* Returns `got` wrapped with cache to be used as normal got
 */
 
 export default function gotCached(options) {

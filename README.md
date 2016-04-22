@@ -1,7 +1,7 @@
 got-cached
 =====================
 
-Got cached is a provider of a cache wrapper around `got` (for http GET requests).
+Got cached provides a cache wrapper around `got`
 
 note: cache hits only include `response.status` (200) and `response.body`
 
@@ -16,6 +16,8 @@ $ npm install --save got-cached
 `gotChached` takes options that should include a cache object
 that is expected to to have the functions `set(key, value)` and `get(key)`
 (returning a Promise that resolves the value).
+
+Below is an example using `then-redis` to cache with a 10 minute expiry
 
 ```
 import fs from 'fs'
@@ -36,7 +38,4 @@ const got = gotCached(options)
 got('http://httpbin.org/get').then((response) => {
   console.log(response.body)
 })
-
-// Streams are not cached, but still play nicely
-got.stream('todomvc.com').pipe(fs.createWriteStream('index.html'))
 ```
