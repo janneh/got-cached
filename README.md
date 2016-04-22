@@ -1,11 +1,21 @@
 got-cached
 =====================
 
-Got cached is a provider of a cache wrapper around got (for http GET requests).
-Cache is expected to to have functions `set(key, value)` and `get(key)`
-(returning a Promise that resolves the value).
+Got cached is a provider of a cache wrapper around `got` (for http GET requests).
 
 note: cache hits only include `response.status` (200) and `response.body`
+
+## Install
+
+```
+$ npm install --save got-cached
+```
+
+## Usage
+
+`gotChached` takes options that should include a cache object
+that is expected to to have the functions `set(key, value)` and `get(key)`
+(returning a Promise that resolves the value).
 
 ```
 import fs from 'fs'
