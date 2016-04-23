@@ -6,42 +6,31 @@ import gotCached from '../'
 const URL = 'http://foo.com'
 const MOCK_HOST = 'http://bar.com'
 const MOCK_PATH = '/bar'
-const CACHE_DATA = { cached: 'cached' }
 const MOCK_DATA = { mock: 'mock' }
+const CACHED_TEXT = 'cached'
+const CACHED_JSON = { cached: 'cached' }
 
 test('returns a function called with new', function (t) {
   t.plan(1)
-  t.is(typeof new gotCached({ got: true, cache: true }), 'function')
+  t.is(typeof new gotCached({ cache: {} }), 'function')
 })
 
 test('returns a function called without new', function (t) {
   t.plan(1)
-  t.is(typeof gotCached({ got: true, cache: true }), 'function')
+  t.is(typeof gotCached({ cache: {} }), 'function')
 })
 
 test('call without options.cache throws', function (t) {
   t.plan(1)
-  t.throws(() => gotCached({ got: true }))
+  t.throws(() => gotCached())
 })
 
 test('call with options.cache does not throws', function (t) {
   t.plan(1)
-  t.doesNotThrow(() => gotCached({ cache: true }))
+  t.doesNotThrow(() => gotCached({ cache: {} }))
 })
 
-test('got returns cached data if cache exists', function (t) {
-  t.plan(1)
-
-  const cacheStub = {
-    get: sinon.stub().returns(Promise.resolve(CACHE_DATA)),
-    set: sinon.stub()
-  }
-  const got = gotCached({ cache: cacheStub })
-
-  got(URL).then(response => { t.deepEqual(response.body, CACHE_DATA) })
-})
-
-test('got returns response data if no cache exists', function (t) {
+test('returns response data if no cache exists', function (t) {
   t.plan(1)
 
   const scope = nock(MOCK_HOST) // eslint-disable-line no-unused-vars
@@ -55,12 +44,43 @@ test('got returns response data if no cache exists', function (t) {
 
   const got = gotCached({ cache: cacheStub })
 
-  got(`${MOCK_HOST}${MOCK_PATH}`).then((response) =>  {
-    t.deepEqual(JSON.parse(response.body), MOCK_DATA)
-  })
+  got(`${MOCK_HOST}${MOCK_PATH}`, { json: true })
+    .then((response) =>  {
+      t.deepEqual(response.body, MOCK_DATA)
+    })
 })
 
-test('got.stream is a function', function(t) {
+test('returns cached text data if cached', function (t) {
+  t.plan(1)
+
+  const cacheStub = {
+    get: sinon.stub().returns(Promise.resolve(CACHED_TEXT)),
+    set: sinon.stub()
+  }
+  const got = gotCached({ cache: cacheStub })
+
+  got(URL)
+    .then(response => {
+      t.deepEqual(response.body, CACHED_TEXT)
+    })
+})
+
+test('returns cached json data if cached and options.json', function (t) {
+  t.plan(1)
+
+  const cacheStub = {
+    get: sinon.stub().returns(Promise.resolve(JSON.stringify(CACHED_JSON))),
+    set: sinon.stub()
+  }
+  const got = gotCached({ cache: cacheStub })
+
+  got(URL, { json: true })
+    .then(response => {
+      t.deepEqual(response.body, CACHED_JSON)
+    })
+})
+
+test('.stream is a function', function(t) {
   t.plan(1)
 
   const got = gotCached({ cache: {} })
