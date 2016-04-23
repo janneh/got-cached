@@ -1,6 +1,6 @@
 {
   "name": "got-cached",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Got response cache for get requests",
   "author": "janneh",
   "license": "MIT",
@@ -14,7 +14,8 @@
   "scripts": {
     "test": "npm run lint && babel-node ./test | faucet",
     "lint": "eslint index.js",
-    "build": "babel -d ./build index.js"
+    "build": "babel -d ./build index.js",
+    "prepublish": "npm run build"
   },
   "dependencies": {
     "got": "^6.3.0"
