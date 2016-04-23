@@ -8,21 +8,14 @@ export default function gotCached(config) {
   if (!config.cache) throw Error('cache is a required option')
   const { cache } = config
 
-  function setCache(key, response, options) {
-    const promise = response.then(response => {
-      const value = options.json
-        ? JSON.stringify(response.body)
-        : response.body
-      cache.set(key, value)
+  function setCache(key, value, options) {
+    if(options.json) value = JSON.stringify(value)
 
-      return Promise.resolve(response)
-    })
-
-    return promise
+    cache.set(key, value)
   }
 
   function getCache(key, options) {
-    const promise = cache.get(key).then(value => {
+    return cache.get(key).then(value => {
       if (!value) return null
       if (options.json) value = JSON.parse(value)
 
@@ -31,8 +24,6 @@ export default function gotCached(config) {
         body: value
       })
     })
-
-    return promise
   }
 
   const cachedGot = function(url, options = {}) {
@@ -46,8 +37,12 @@ export default function gotCached(config) {
         // return the cached result if it exist
         if(cached) return cached
 
-        // return got response but first set cache with it
-        return setCache(url, got(url, options), options)
+        // return got response after setting cache
+        return got(url, options).then(response => {
+          setCache(url, response.body, options)
+
+          return Promise.resolve(response)
+        })
       })
 
     return cachedResponse
