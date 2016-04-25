@@ -3,7 +3,7 @@ got-cached
 
 Got cached provides a cache wrapper around `got`
 
-note: cache hits only include `response.status` (200) and `response.body`
+note: cache hits only include props `response.status` (200) and `response.body`
 
 ## Install
 
