@@ -48,5 +48,7 @@ export default function gotCached(config) {
     return cachedResponse
   }
 
-  return Object.assign(cachedGot, got)
+  return Object.assign(cachedGot, got, {
+    get: (url, options) => cachedGot(url, options)
+  })
 }
