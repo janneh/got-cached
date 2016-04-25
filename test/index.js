@@ -50,6 +50,41 @@ test('returns response data if no cache exists', function (t) {
     })
 })
 
+test('.get returns response data if no cache exists', function (t) {
+  t.plan(1)
+
+  const scope = nock(MOCK_HOST) // eslint-disable-line no-unused-vars
+    .get(MOCK_PATH)
+    .reply(200, MOCK_DATA)
+
+  const cacheStub = {
+    get: sinon.stub().withArgs(URL).returns(Promise.resolve(null)),
+    set: function() {}
+  }
+
+  const got = gotCached({ cache: cacheStub })
+
+  got.get(`${MOCK_HOST}${MOCK_PATH}`, { json: true })
+    .then((response) =>  {
+      t.deepEqual(response.body, MOCK_DATA)
+    })
+})
+
+test('.get cached text data if cached', function (t) {
+  t.plan(1)
+
+  const cacheStub = {
+    get: sinon.stub().returns(Promise.resolve(CACHED_TEXT)),
+    set: sinon.stub()
+  }
+  const got = gotCached({ cache: cacheStub })
+
+  got.get(URL)
+    .then(response => {
+      t.deepEqual(response.body, CACHED_TEXT)
+    })
+})
+
 test('returns cached text data if cached', function (t) {
   t.plan(1)
 
