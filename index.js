@@ -6,6 +6,7 @@ import got from 'got'
 
 export default function gotCached(config) {
   if (!config.cache) throw Error('cache is a required option')
+
   const { cache } = config
 
   function setCache(key, value, options) {
@@ -15,37 +16,40 @@ export default function gotCached(config) {
   }
 
   function getCache(key, options) {
-    return cache.get(key).then(value => {
-      if (!value) return null
-      if (options.json) value = JSON.parse(value)
+    return cache.get(key)
+      .then(value => {
+        if (!value) return null
+        if (options.json) value = JSON.parse(value)
 
-      return Promise.resolve({
-        status: 200,
-        body: value
+        return Promise.resolve({
+          status: 200,
+          body: value
+        })
       })
+  }
+
+  function cachingGot(url, options) {
+    return got(url, options).then(response => {
+      setCache(url, response.body, options)
+
+      return Promise.resolve(response)
     })
   }
 
-  const cachedGot = function(url, options = {}) {
+  function cachedGot(url, options = {}) {
     // return plain got for non-GET requests
     if (options.method && options.method !== 'GET') {
       return got(url, options)
     }
 
-    const cachedResponse = getCache(url, options)
-      .then((cached) => {
+    return getCache(url, options)
+      .then(cached => {
         // return the cached result if it exist
         if(cached) return cached
 
         // return got response after setting cache
-        return got(url, options).then(response => {
-          setCache(url, response.body, options)
-
-          return Promise.resolve(response)
-        })
+        return cachingGot(url, options)
       })
-
-    return cachedResponse
   }
 
   return Object.assign(cachedGot, got, {
