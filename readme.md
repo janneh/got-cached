@@ -19,7 +19,7 @@ that is expected to to have the functions `set(key, value)` and `get(key)`
 
 Below is an example using `then-redis` to cache with a 10 minute expiry
 
-```
+```js
 import { createClient } from 'then-redis'
 import gotCached from 'got-cached'
 
